@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SDL.h>
+#include <GL/glew.h>
 
 class RenderingLoop
 {
@@ -9,7 +10,14 @@ public:
     void Run();
 
 private:
-    SDL_Window* m_window;
+    void InitRendering();
+
+private:
+    SDL_Window* window_;
+
+    GLuint program_;
+    GLuint vao_;
+    GLuint vbo_;
 };
 
 
