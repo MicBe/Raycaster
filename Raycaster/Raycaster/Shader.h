@@ -15,16 +15,11 @@ public:
 
 public:
     Shader(ShaderType shader_type, const std::string& source_code);
-    
-    Shader(const Shader&) = default;
-    Shader(Shader&&) = default;
-    Shader& operator=(const Shader&) = default;
-    Shader& operator=(Shader&&) = default;
-    virtual ~Shader();
+    ~Shader();
 
     bool Compile();
     GLuint GetId() const;
-    const std::string& GetLastError();
+    const std::string& GetLastError() const;
 
 protected:
     GLuint id_;

@@ -1,23 +1,20 @@
 #pragma once
 
 #include <SDL.h>
-#include <GL/glew.h>
+
+#include <memory>
+
+class IRenderable;
 
 class RenderingLoop
 {
 public:
-    RenderingLoop();
+    RenderingLoop(std::unique_ptr<IRenderable> renderable);
     void Run();
 
 private:
-    void InitRendering();
-
-private:
+    std::unique_ptr<IRenderable> renderable_;
     SDL_Window* window_;
-
-    GLuint program_;
-    GLuint vao_;
-    GLuint vbo_;
 };
 
 

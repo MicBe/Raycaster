@@ -1,19 +1,15 @@
 #include "RenderingLoop.h"
 
-#include "Program.h"
-#include "Shader.h"
+#include "IRenderable.h"
 
 #include <GL/glew.h>
 
 #include <exception>
-#include <fstream>
-#include <streambuf>
+#include <vector>
 
-RenderingLoop::RenderingLoop()
-    :window_(nullptr),
-    program_(-1),
-    vao_(-1),
-    vbo_(-1)
+RenderingLoop::RenderingLoop(std::unique_ptr<IRenderable> renderable)
+    : renderable_(std::move(renderable)),
+    window_(nullptr)
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
         throw std::exception("Unable to init SDL");
@@ -38,12 +34,12 @@ RenderingLoop::RenderingLoop()
         throw std::exception("Glew failed to initialize");
 
     glViewport(0, 0, WINDOW_SIZE_X, WINDOW_SIZE_Y);
-
-    InitRendering();
 }
 
 void RenderingLoop::Run()
 {
+    renderable_->Init();
+
     SDL_Event event;
 
     bool quit = false;
@@ -66,55 +62,7 @@ void RenderingLoop::Run()
                 quit = true;
             }
         }
-
-        // Render
-
-        glUseProgram(program_);
-
-        glBindVertexArray(vao_);
-        glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
-        // Swap
+        renderable_->Render();
         SDL_GL_SwapWindow(window_);
     }
-}
-
-void RenderingLoop::InitRendering()
-{
-    {
-        std::ifstream vertex_shader_src("vert.glsl");
-        std::ifstream fragment_shader_src("frag.glsl");
-
-        Shader vertex_shader(Shader::ShaderType::VertexShader, std::string(std::istreambuf_iterator<char>(vertex_shader_src), std::istreambuf_iterator<char>()));
-        Shader frag_shader(Shader::ShaderType::FragmentShader, std::string(std::istreambuf_iterator<char>(fragment_shader_src), std::istreambuf_iterator<char>()));
-
-        if (!vertex_shader.Compile())
-            throw std::exception((std::string("Unable to compile vertex shader: ") + vertex_shader.GetLastError()).c_str());
-        if (!frag_shader.Compile())
-            throw std::exception((std::string("Unable to compile fragment shader: ") + frag_shader.GetLastError()).c_str());
-
-        Program program(vertex_shader.GetId(), frag_shader.GetId());
-        if (!program.Link())
-            throw std::exception((std::string("Unable to compile fragment shader: ") + program.GetLastError()).c_str());
-
-        program_ = program.GetId();
-    }
-
-    glGenBuffers(1, &vbo_);
-    glGenVertexArrays(1, &vao_);
-
-    const float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
-        0.0f,  0.5f, 0.0f
-    };
-
-    glBindVertexArray(vao_);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_); // Not saved into vao
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); // Not saved into vao
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
 }

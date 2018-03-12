@@ -37,7 +37,7 @@ GLuint Shader::GetId() const
     return id_;
 }
 
-const std::string& Shader::GetLastError()
+const std::string& Shader::GetLastError() const
 {
     return last_error_;
 }
