@@ -52,9 +52,12 @@ void Raycaster::Init()
     glEnableVertexAttribArray(0); // Coords
     glEnableVertexAttribArray(1); // Tex coords
 
-    int x, y, channels;
+    /*int x, y, channels;
     stbi_set_flip_vertically_on_load(1);
-    stbi_uc* image = stbi_load("textures/test_borders.png", &x, &y, &channels, STBI_rgb);
+    stbi_uc* image = stbi_load("textures/test_borders.png", &x, &y, &channels, STBI_rgb);*/
+
+    for (size_t i = 0; i < framebuffer_.size(); ++i)
+        framebuffer_[i] = 128;
 
     GLuint texture;
     glGenTextures(1, &texture);
@@ -64,9 +67,12 @@ void Raycaster::Init()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, x, y, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, &framebuffer_[0]/*image*/);
 
-    stbi_image_free(image);
+    /*stbi_image_free(image);*/
+
+    glUseProgram(textured_quad_shader_.GetId());
+    textured_quad_shader_.SetInt("TexCoord", 0);
 }
 
 void Raycaster::Render()
@@ -74,11 +80,17 @@ void Raycaster::Render()
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    static int val = 128;
+    for (size_t i = 0; i < framebuffer_.size(); ++i)
+        framebuffer_[i] = val;
+
+    --val;
+
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 800, 600, GL_RGB, GL_UNSIGNED_BYTE, &framebuffer_[0]);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_);
     
     glUseProgram(textured_quad_shader_.GetId());
-    textured_quad_shader_.SetInt("TexCoord", 0);
 
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, 6);

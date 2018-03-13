@@ -1,5 +1,6 @@
 #include "RenderingLoop.h"
 
+#include "ConsoleFpsCounter.h"
 #include "IRenderable.h"
 
 #include <GL/glew.h>
@@ -40,9 +41,10 @@ void RenderingLoop::Run()
 {
     renderable_->Init();
 
-    SDL_Event event;
-
     bool quit = false;
+
+    SDL_Event event;
+    ConsoleFpsCounter fps_counter;
     while (!quit)
     {
         // Process events
@@ -64,5 +66,7 @@ void RenderingLoop::Run()
         }
         renderable_->Render();
         SDL_GL_SwapWindow(window_);
+
+        fps_counter.FrameFinished();
     }
 }

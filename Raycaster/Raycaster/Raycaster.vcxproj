@@ -82,6 +82,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ConsoleFpsCounter.cpp" />
     <ClCompile Include="IRenderable.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
@@ -90,6 +91,7 @@
     <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ConsoleFpsCounter.h" />
     <ClInclude Include="IRenderable.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Raycaster.h" />
