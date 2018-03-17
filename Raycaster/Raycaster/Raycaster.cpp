@@ -11,7 +11,8 @@
 Raycaster::Raycaster()
     : vao_(-1),
     vbo_(-1),
-    texture_(-1)
+    texture_(-1),
+    framebuffer_(kFramebufferWidth, kFramebufferHeight, kFramebufferChannels)
 {
 }
 
@@ -56,9 +57,6 @@ void Raycaster::Init()
     stbi_set_flip_vertically_on_load(1);
     stbi_uc* image = stbi_load("textures/test_borders.png", &x, &y, &channels, STBI_rgb);*/
 
-    for (size_t i = 0; i < framebuffer_.size(); ++i)
-        framebuffer_[i] = 128;
-
     GLuint texture;
     glGenTextures(1, &texture);
 
@@ -67,7 +65,7 @@ void Raycaster::Init()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 800, 600, 0, GL_RGB, GL_UNSIGNED_BYTE, &framebuffer_[0]/*image*/);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, kFramebufferWidth, kFramebufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, framebuffer_.Get());
 
     /*stbi_image_free(image);*/
 
@@ -80,13 +78,7 @@ void Raycaster::Render()
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    static int val = 128;
-    for (size_t i = 0; i < framebuffer_.size(); ++i)
-        framebuffer_[i] = val;
-
-    --val;
-
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, 800, 600, GL_RGB, GL_UNSIGNED_BYTE, &framebuffer_[0]);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, kFramebufferWidth, kFramebufferHeight, GL_RGB, GL_UNSIGNED_BYTE, framebuffer_.Get());
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_);
     
@@ -94,4 +86,22 @@ void Raycaster::Render()
 
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void Raycaster::Update()
+{
+    static uint8_t red = 0;
+    static uint8_t green = 0;
+    static uint8_t blue = 0;
+
+    for (size_t i = 0; i < framebuffer_.GetWidth(); ++i)
+    {
+        for (size_t j = 0; j < framebuffer_.GetHeight(); ++j)
+        {
+            framebuffer_.SetPixel(i, j, red, green, blue);
+        }
+    }
+    red++;
+    green++;
+    blue++;
 }

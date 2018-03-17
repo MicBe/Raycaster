@@ -1,10 +1,10 @@
 #pragma once
 
+#include "Framebuffer.h"
 #include "IRenderable.h"
 #include "ShaderProgram.h"
 
 #include <GL/glew.h>
-
 #include <array>
 
 class Raycaster : public IRenderable
@@ -14,14 +14,19 @@ public:
 
     virtual void Init() override;
     virtual void Render() override;
+    virtual void Update() override;
 
 private:
     ShaderProgram textured_quad_shader_;
     GLuint vao_;
     GLuint vbo_;
 
-    std::array<unsigned char, 800 * 600 * 3> framebuffer_;
-
     GLuint texture_;
+
+    Framebuffer framebuffer_;
+
+    static const int32_t kFramebufferWidth = 800;
+    static const int32_t kFramebufferHeight = 600;
+    static const int32_t kFramebufferChannels = 3;
 };
 

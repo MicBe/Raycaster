@@ -83,6 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ConsoleFpsCounter.cpp" />
+    <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="IRenderable.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
@@ -92,6 +93,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConsoleFpsCounter.h" />
+    <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="IRenderable.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Raycaster.h" />

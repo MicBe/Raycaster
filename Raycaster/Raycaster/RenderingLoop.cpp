@@ -64,6 +64,7 @@ void RenderingLoop::Run()
                 quit = true;
             }
         }
+        renderable_->Update();
         renderable_->Render();
         SDL_GL_SwapWindow(window_);
 
