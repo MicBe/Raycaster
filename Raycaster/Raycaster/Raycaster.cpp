@@ -12,7 +12,7 @@ Raycaster::Raycaster()
     : vao_(-1),
     vbo_(-1),
     texture_(-1),
-    framebuffer_(kFramebufferWidth, kFramebufferHeight, kFramebufferChannels)
+    framebuffer_(kFramebufferWidth, kFramebufferHeight)
 {
 }
 
@@ -65,7 +65,7 @@ void Raycaster::Init()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, kFramebufferWidth, kFramebufferHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, framebuffer_.Get());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, kFramebufferWidth, kFramebufferHeight, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, framebuffer_.Get());
 
     /*stbi_image_free(image);*/
 
@@ -78,7 +78,7 @@ void Raycaster::Render()
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, kFramebufferWidth, kFramebufferHeight, GL_RGB, GL_UNSIGNED_BYTE, framebuffer_.Get());
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, kFramebufferWidth, kFramebufferHeight, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, framebuffer_.Get());
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_);
     
@@ -90,18 +90,27 @@ void Raycaster::Render()
 
 void Raycaster::Update()
 {
-    static uint8_t red = 0;
-    static uint8_t green = 0;
-    static uint8_t blue = 0;
-
-    for (size_t i = 0; i < framebuffer_.GetWidth(); ++i)
+    uint8_t red = 0, green = 0, blue = 0;
+    for (uint32_t y = 0; y < framebuffer_.GetHeight(); ++y)
     {
-        for (size_t j = 0; j < framebuffer_.GetHeight(); ++j)
+        if (y < 213)
         {
-            framebuffer_.SetPixel(i, j, red, green, blue);
+            ++red;
+            green = 0;
+            blue = 0;
         }
+        else if (y < 426)
+        {
+            red = 0;
+            ++green;
+            blue = 0;
+        }
+        else
+        {
+            red = 0;
+            green = 0;
+            ++blue;
+        }
+        framebuffer_.DrawHorizontalLine(y, (red << 24) | (green << 16) | (blue << 8));
     }
-    red++;
-    green++;
-    blue++;
 }

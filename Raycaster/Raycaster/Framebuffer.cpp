@@ -1,33 +1,48 @@
 #include "Framebuffer.h"
 
-Framebuffer::Framebuffer(int32_t width, int32_t height, int32_t channels)
-    :buffer_(width * height * channels),
+#include <algorithm>
+
+Framebuffer::Framebuffer(uint32_t width, uint32_t height)
+    : buffer_size_(width * height),
+    buffer_(new uint32_t[buffer_size_]),
     width_(width),
-    height_(height),
-    channels_(channels)
+    height_(height)
 {
 }
 
-const uint8_t* const Framebuffer::Get() const
+Framebuffer::~Framebuffer()
 {
-    return &buffer_[0];
+    delete[] buffer_;
 }
 
-int32_t Framebuffer::GetWidth() const
+const uint32_t* const Framebuffer::Get() const
+{
+    return buffer_;
+}
+
+uint32_t Framebuffer::GetWidth() const
 {
     return width_;
 }
 
-int32_t Framebuffer::GetHeight() const
+uint32_t Framebuffer::GetHeight() const
 {
     return height_;
 }
 
-void Framebuffer::SetPixel(size_t x, size_t y, uint8_t red, uint8_t green, uint8_t blue)
+void Framebuffer::Fill(uint32_t rgba)
 {
-    size_t position = (y * GetWidth() * channels_) + (x * channels_);
-    buffer_[position++] = red;
-    buffer_[position++] = green;
-    buffer_[position] = blue;
+    std::fill(buffer_, buffer_ + buffer_size_, rgba);
+}
+
+void Framebuffer::DrawHorizontalLine(uint32_t y, uint32_t rgba)
+{
+    uint32_t* const start_position = buffer_ + GetWidth() * y;
+    std::fill(start_position, start_position + GetWidth(), rgba);
+}
+
+void Framebuffer::SetPixel(size_t x, size_t y, uint32_t rgba)
+{
+    buffer_[y * GetWidth() + x] = rgba;
 }
 

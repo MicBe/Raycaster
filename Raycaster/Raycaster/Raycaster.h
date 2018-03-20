@@ -25,8 +25,7 @@ private:
 
     Framebuffer framebuffer_;
 
-    static const int32_t kFramebufferWidth = 800;
-    static const int32_t kFramebufferHeight = 600;
-    static const int32_t kFramebufferChannels = 3;
+    static const int32_t kFramebufferWidth = 480;
+    static const int32_t kFramebufferHeight = 640;
 };
 
