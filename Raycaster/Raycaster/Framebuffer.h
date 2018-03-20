@@ -14,6 +14,7 @@ public:
 
     void Fill(uint32_t rgba);
     void DrawHorizontalLine(uint32_t y, uint32_t rgba);
+    void DrawHorizontalLine(uint32_t y, uint32_t start_pos, uint32_t end_pos, uint32_t rgba);
 
     void SetPixel(size_t x, size_t y, uint32_t rgba);
 

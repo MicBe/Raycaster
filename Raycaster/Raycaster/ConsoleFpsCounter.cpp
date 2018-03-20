@@ -22,7 +22,7 @@ void ConsoleFpsCounter::FrameFinished()
     ticks_cumul_ += delta_ticks;
     if (ticks_cumul_ >= 1000)
     {
-        std::cout << "Fps: " << frame_count_ << '\n';
+        std::cout << "Fps: " << frame_count_ << '\r';
         frame_count_ = 0;
         ticks_cumul_ = 0;
     }

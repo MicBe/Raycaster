@@ -75,8 +75,8 @@ void Raycaster::Init()
 
 void Raycaster::Render()
 {
-    glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    /*glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);*/
 
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, kFramebufferWidth, kFramebufferHeight, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, framebuffer_.Get());
     glActiveTexture(GL_TEXTURE0);
@@ -90,8 +90,11 @@ void Raycaster::Render()
 
 void Raycaster::Update()
 {
-    uint8_t red = 0, green = 0, blue = 0;
-    for (uint32_t y = 0; y < framebuffer_.GetHeight(); ++y)
+    uint8_t red = 0, green = 0, blue = 255;
+
+    framebuffer_.DrawHorizontalLine(320, 10, 24, (red << 24) | (green << 16) | (blue << 8));
+
+    /*for (uint32_t y = 0; y < framebuffer_.GetHeight(); ++y)
     {
         if (y < 213)
         {
@@ -112,5 +115,5 @@ void Raycaster::Update()
             ++blue;
         }
         framebuffer_.DrawHorizontalLine(y, (red << 24) | (green << 16) | (blue << 8));
-    }
+    }*/
 }

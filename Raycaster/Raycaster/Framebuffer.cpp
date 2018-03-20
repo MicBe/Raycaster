@@ -8,6 +8,7 @@ Framebuffer::Framebuffer(uint32_t width, uint32_t height)
     width_(width),
     height_(height)
 {
+    Fill(0);
 }
 
 Framebuffer::~Framebuffer()
@@ -37,8 +38,13 @@ void Framebuffer::Fill(uint32_t rgba)
 
 void Framebuffer::DrawHorizontalLine(uint32_t y, uint32_t rgba)
 {
-    uint32_t* const start_position = buffer_ + GetWidth() * y;
-    std::fill(start_position, start_position + GetWidth(), rgba);
+    DrawHorizontalLine(y, 0, GetWidth(), rgba);
+}
+
+void Framebuffer::DrawHorizontalLine(uint32_t y, uint32_t start_pos, uint32_t end_pos, uint32_t rgba)
+{
+    uint32_t* const line_start = buffer_ + (GetWidth() * y) + start_pos;
+    std::fill(line_start, line_start + end_pos, rgba);
 }
 
 void Framebuffer::SetPixel(size_t x, size_t y, uint32_t rgba)

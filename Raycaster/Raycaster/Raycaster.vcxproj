@@ -94,19 +94,23 @@
     <ClCompile Include="Framebuffer.cpp" />
     <ClCompile Include="IRenderable.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Raycaster.cpp" />
     <ClCompile Include="RenderingLoop.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConsoleFpsCounter.h" />
     <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="IRenderable.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Raycaster.h" />
     <ClInclude Include="RenderingLoop.h" />
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="World.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="frag.glsl" />
