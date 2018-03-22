@@ -95,6 +95,7 @@
     <ClCompile Include="IRenderable.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="RaycasterGraphics.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Raycaster.cpp" />
     <ClCompile Include="RenderingLoop.cpp" />
@@ -106,6 +107,7 @@
     <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="IRenderable.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="RaycasterGraphics.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Raycaster.h" />
     <ClInclude Include="RenderingLoop.h" />

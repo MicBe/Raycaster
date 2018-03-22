@@ -9,8 +9,8 @@ public:
     ~Framebuffer();
 
     const uint32_t* const Get() const;
-    uint32_t GetWidth() const;
-    uint32_t GetHeight() const;
+    uint32_t width() const;
+    uint32_t height() const;
 
     void Fill(uint32_t rgba);
     void DrawHorizontalLine(uint32_t y, uint32_t rgba);

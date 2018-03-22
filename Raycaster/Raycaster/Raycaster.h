@@ -1,11 +1,10 @@
 #pragma once
 
-#include "Framebuffer.h"
 #include "IRenderable.h"
-#include "ShaderProgram.h"
 
-#include <GL/glew.h>
-#include <array>
+#include "Camera.h"
+#include "RaycasterGraphics.h"
+#include "World.h"
 
 class Raycaster : public IRenderable
 {
@@ -17,15 +16,17 @@ public:
     virtual void Update() override;
 
 private:
-    ShaderProgram textured_quad_shader_;
-    GLuint vao_;
-    GLuint vbo_;
+    Camera camera_;
+    World world_;
+    RaycasterGraphics graphics_;
 
-    GLuint texture_;
-
-    Framebuffer framebuffer_;
-
-    static const int32_t kFramebufferWidth = 480;
-    static const int32_t kFramebufferHeight = 640;
+private:
+    static const float kInitialPosX;
+    static const float kInitialPosY;
+    static const int32_t kInitialPosOrientationDeg = 135;
+    static const int32_t kfieldOfView = 60;
+    static const int32_t kHeight = 32;
+    static const int32_t kUnitsPerBlock = 64;
+    static const float kMovementUnitsPerSec;
 };
 
