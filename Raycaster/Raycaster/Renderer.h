@@ -13,7 +13,6 @@ public:
 
     void Init();
     void Render();
-    void Update();
 
 private:
     Framebuffer framebuffer_;

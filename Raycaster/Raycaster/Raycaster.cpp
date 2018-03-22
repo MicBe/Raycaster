@@ -23,7 +23,6 @@ void Raycaster::Render()
 
 void Raycaster::Update()
 {
-    renderer_.Update();
 }
 
 const float Raycaster::kInitialPosY = 96.0f;

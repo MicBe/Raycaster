@@ -54,9 +54,9 @@ void Renderer::Init()
     glEnableVertexAttribArray(0); // Coords
     glEnableVertexAttribArray(1); // Tex coords
 
-                                  /*int x, y, channels;
-                                  stbi_set_flip_vertically_on_load(1);
-                                  stbi_uc* image = stbi_load("textures/test_borders.png", &x, &y, &channels, STBI_rgb);*/
+    /*int x, y, channels;
+    stbi_set_flip_vertically_on_load(1);
+    stbi_uc* image = stbi_load("textures/test_borders.png", &x, &y, &channels, STBI_rgb);*/
 
     GLuint texture;
     glGenTextures(1, &texture);
@@ -76,8 +76,13 @@ void Renderer::Init()
 
 void Renderer::Render()
 {
-    /*glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);*/
+    // Draw in framebuffer
+    uint8_t red = 0, green = 0, blue = 255;
+    framebuffer_.DrawHorizontalLine(320, 10, 24, (red << 24) | (green << 16) | (blue << 8));
+
+    // Render the framebuffer to texture
+    glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, kFramebufferWidth, kFramebufferHeight, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, framebuffer_.Get());
     glActiveTexture(GL_TEXTURE0);
@@ -88,11 +93,3 @@ void Renderer::Render()
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
-
-void Renderer::Update()
-{
-    uint8_t red = 0, green = 0, blue = 255;
-
-    framebuffer_.DrawHorizontalLine(320, 10, 24, (red << 24) | (green << 16) | (blue << 8));
-}
-

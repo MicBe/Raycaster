@@ -53,6 +53,7 @@
       <BufferSecurityCheck>true</BufferSecurityCheck>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;glew32s.lib;opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -92,25 +93,25 @@
   <ItemGroup>
     <ClCompile Include="ConsoleFpsCounter.cpp" />
     <ClCompile Include="Framebuffer.cpp" />
-    <ClCompile Include="IRenderable.cpp" />
+    <ClCompile Include="IGameLoop.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Raycaster.cpp" />
-    <ClCompile Include="RenderingLoop.cpp" />
+    <ClCompile Include="GameLoop.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ConsoleFpsCounter.h" />
     <ClInclude Include="Framebuffer.h" />
-    <ClInclude Include="IRenderable.h" />
+    <ClInclude Include="IGameLoop.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Raycaster.h" />
-    <ClInclude Include="RenderingLoop.h" />
+    <ClInclude Include="GameLoop.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>

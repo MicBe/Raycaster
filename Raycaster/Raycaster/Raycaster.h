@@ -1,12 +1,12 @@
 #pragma once
 
-#include "IRenderable.h"
+#include "IGameLoop.h"
 
 #include "Camera.h"
 #include "Renderer.h"
 #include "World.h"
 
-class Raycaster : public IRenderable
+class Raycaster : public IGameLoop
 {
 public:
     Raycaster();

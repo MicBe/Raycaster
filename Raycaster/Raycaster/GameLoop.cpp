@@ -1,15 +1,15 @@
-#include "RenderingLoop.h"
+#include "GameLoop.h"
 
 #include "ConsoleFpsCounter.h"
-#include "IRenderable.h"
+#include "IGameLoop.h"
 
 #include <GL/glew.h>
 
 #include <exception>
 #include <vector>
 
-RenderingLoop::RenderingLoop(std::unique_ptr<IRenderable> renderable)
-    : renderable_(std::move(renderable)),
+GameLoop::GameLoop(std::unique_ptr<IGameLoop> gameloop)
+    : concrete_gameloop_(std::move(gameloop)),
     window_(nullptr)
 {
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -37,9 +37,9 @@ RenderingLoop::RenderingLoop(std::unique_ptr<IRenderable> renderable)
     glViewport(0, 0, WINDOW_SIZE_X, WINDOW_SIZE_Y);
 }
 
-void RenderingLoop::Run()
+void GameLoop::Run()
 {
-    renderable_->Init();
+    concrete_gameloop_->Init();
 
     bool quit = false;
 
@@ -50,7 +50,17 @@ void RenderingLoop::Run()
         // Process events
         while (SDL_PollEvent(&event) != 0)
         {
-            if (event.type == SDL_WINDOWEVENT)
+            if (event.type == SDL_KEYDOWN)
+            {
+                //concrete_gameloop_->HandleEvent(event.key.keysym.sym);
+                /*switch (e.key.keysym.sym)
+                {
+                case SDLK_UP:
+                    gCurrentSurface = gKeyPressSurfaces[KEY_PRESS_SURFACE_UP];
+                    break;
+                }*/
+            }
+            else if (event.type == SDL_WINDOWEVENT)
             {
                 switch (event.window.event)
                 {
@@ -64,8 +74,9 @@ void RenderingLoop::Run()
                 quit = true;
             }
         }
-        renderable_->Update();
-        renderable_->Render();
+        // TODO: Handle events in gameloop
+        concrete_gameloop_->Update();
+        concrete_gameloop_->Render();
         SDL_GL_SwapWindow(window_);
 
         fps_counter.FrameFinished();
