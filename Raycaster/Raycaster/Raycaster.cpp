@@ -7,23 +7,23 @@ Raycaster::Raycaster()
              kfieldOfView, kHeight,
              kMovementUnitsPerSec),
     world_(kUnitsPerBlock),
-    graphics_()
+    renderer_()
 {
 }
 
 void Raycaster::Init()
 {
-    graphics_.Init();
+    renderer_.Init();
 }
 
 void Raycaster::Render()
 {
-    graphics_.Render();
+    renderer_.Render();
 }
 
 void Raycaster::Update()
 {
-    graphics_.Update();
+    renderer_.Update();
 }
 
 const float Raycaster::kInitialPosY = 96.0f;

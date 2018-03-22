@@ -1,4 +1,4 @@
-#include "RaycasterGraphics.h"
+#include "Renderer.h"
 
 #include "Shader.h"
 
@@ -8,7 +8,7 @@
 #include <fstream>
 #include <streambuf>
 
-RaycasterGraphics::RaycasterGraphics()
+Renderer::Renderer()
     : framebuffer_(kFramebufferWidth, kFramebufferHeight),
     textured_quad_shader_(),
     vao_(-1),
@@ -17,7 +17,7 @@ RaycasterGraphics::RaycasterGraphics()
 {
 }
 
-void RaycasterGraphics::Init()
+void Renderer::Init()
 {
     std::ifstream vertex_shader_src("vert.glsl");
     std::ifstream fragment_shader_src("frag.glsl");
@@ -74,7 +74,7 @@ void RaycasterGraphics::Init()
     textured_quad_shader_.SetInt("TexCoord", 0);
 }
 
-void RaycasterGraphics::Render()
+void Renderer::Render()
 {
     /*glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);*/
@@ -89,7 +89,7 @@ void RaycasterGraphics::Render()
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void RaycasterGraphics::Update()
+void Renderer::Update()
 {
     uint8_t red = 0, green = 0, blue = 255;
 

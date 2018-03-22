@@ -6,10 +6,10 @@
 #include <GL/glew.h>
 
 
-class RaycasterGraphics
+class Renderer
 {
 public:
-    RaycasterGraphics();
+    Renderer();
 
     void Init();
     void Render();

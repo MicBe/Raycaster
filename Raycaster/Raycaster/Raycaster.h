@@ -3,7 +3,7 @@
 #include "IRenderable.h"
 
 #include "Camera.h"
-#include "RaycasterGraphics.h"
+#include "Renderer.h"
 #include "World.h"
 
 class Raycaster : public IRenderable
@@ -18,7 +18,7 @@ public:
 private:
     Camera camera_;
     World world_;
-    RaycasterGraphics graphics_;
+    Renderer renderer_;
 
 private:
     static const float kInitialPosX;
