@@ -15,8 +15,8 @@ GameLoop::GameLoop(std::unique_ptr<IGameLoop> gameloop)
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
         throw std::exception("Unable to init SDL");
 
-    static const int WINDOW_SIZE_X = 800;
-    static const int WINDOW_SIZE_Y = 600;
+    static const int WINDOW_SIZE_X = 640;
+    static const int WINDOW_SIZE_Y = 480;
     window_ = SDL_CreateWindow("Raycaster", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_SIZE_X, WINDOW_SIZE_Y, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
     if (!window_)
         throw std::exception("Unable to create window");
