@@ -7,10 +7,9 @@ class ConsoleFpsCounter
 {
 public:
     ConsoleFpsCounter();
-    void FrameFinished();
+    void FrameFinished(uint32_t delta_ticks);
     
 private:
     uint32_t frame_count_;
-    uint32_t last_ticks_;
     uint32_t ticks_cumul_;
 };

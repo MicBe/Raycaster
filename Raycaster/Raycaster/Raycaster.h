@@ -13,7 +13,10 @@ public:
 
     virtual void Init() override;
     virtual void Render() override;
-    virtual void Update() override;
+    virtual void Update(uint32_t delta_ticks) override;
+
+    virtual void OnKeyDown(SDL_Keycode key) override;
+    virtual void OnKeyUp(SDL_Keycode key) override;
 
 private:
     Camera camera_;
@@ -23,7 +26,7 @@ private:
 private:
     static const float kInitialPosX;
     static const float kInitialPosY;
-    static const int32_t kInitialPosOrientationDeg = 135;
+    static const float kInitialPosOrientationDeg;
     static const int32_t kfieldOfView = 60;
     static const int32_t kHeight = 32;
     static const int32_t kUnitsPerBlock = 64;

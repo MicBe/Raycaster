@@ -7,18 +7,14 @@
 
 ConsoleFpsCounter::ConsoleFpsCounter()
     :frame_count_(0),
-    last_ticks_(0),
     ticks_cumul_(0)
 {
 }
 
-void ConsoleFpsCounter::FrameFinished()
+void ConsoleFpsCounter::FrameFinished(uint32_t delta_ticks)
 {
     ++frame_count_;
 
-    const uint32_t current_ticks = SDL_GetTicks();
-    const uint32_t delta_ticks = current_ticks - last_ticks_;
-    last_ticks_ = current_ticks;
     ticks_cumul_ += delta_ticks;
     if (ticks_cumul_ >= 1000)
     {

@@ -45,40 +45,39 @@ void GameLoop::Run()
 
     SDL_Event event;
     ConsoleFpsCounter fps_counter;
+
     while (!quit)
     {
+        uint32_t delta_ticks = ticks_counter_.Update();
+
         // Process events
         while (SDL_PollEvent(&event) != 0)
         {
-            if (event.type == SDL_KEYDOWN)
+            switch (event.type)
             {
-                //concrete_gameloop_->HandleEvent(event.key.keysym.sym);
-                /*switch (e.key.keysym.sym)
-                {
-                case SDLK_UP:
-                    gCurrentSurface = gKeyPressSurfaces[KEY_PRESS_SURFACE_UP];
-                    break;
-                }*/
-            }
-            else if (event.type == SDL_WINDOWEVENT)
-            {
+            case SDL_KEYDOWN:
+                //concrete_gameloop_->OnKeyDown(event.key.keysym.sym);
+                break;
+            case SDL_KEYUP:
+                //concrete_gameloop_->OnKeyUp(event.key.keysym.sym);
+                break;
+            case SDL_WINDOWEVENT:
                 switch (event.window.event)
                 {
                 case SDL_WINDOWEVENT_RESIZED:
                     glViewport(0, 0, event.window.data1, event.window.data2);
                     break;
                 }
-            }
-            else if (event.type == SDL_QUIT)
-            {
+                break;
+            case SDL_QUIT:
                 quit = true;
+                break;
             }
         }
-        // TODO: Handle events in gameloop
-        concrete_gameloop_->Update();
+        concrete_gameloop_->Update(delta_ticks);
         concrete_gameloop_->Render();
         SDL_GL_SwapWindow(window_);
 
-        fps_counter.FrameFinished();
+        fps_counter.FrameFinished(delta_ticks);
     }
 }

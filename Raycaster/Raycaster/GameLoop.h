@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TicksCounter.h"
+
 #include <SDL.h>
 
 #include <memory>
@@ -15,6 +17,7 @@ public:
 private:
     std::unique_ptr<IGameLoop> concrete_gameloop_;
     SDL_Window* window_;
+    TicksCounter ticks_counter_;
 };
 
 

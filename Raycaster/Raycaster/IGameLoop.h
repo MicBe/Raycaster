@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL.h>
+
 class IGameLoop
 {
 public:
@@ -12,6 +14,9 @@ public:
 
     virtual void Init() = 0;
     virtual void Render() = 0;
-    virtual void Update() = 0;
+    virtual void Update(uint32_t delta_ticks) = 0;
+
+    virtual void OnKeyDown(SDL_Keycode key);
+    virtual void OnKeyUp(SDL_Keycode key);
 };
 
