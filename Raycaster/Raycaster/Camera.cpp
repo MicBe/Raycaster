@@ -31,11 +31,15 @@ void Camera::GoBackward(int32_t time_elapsed)
 void Camera::RotateLeft(int32_t time_elapsed)
 {
     orientation_deg_ += static_cast<float>(time_elapsed / 1000.0f) * rotation_angle_per_sec_;
+    if (orientation_deg_ >= 360.0f)
+        orientation_deg_ -= 360.0f;
 }
 
 void Camera::RotateRight(int32_t time_elapsed)
 {
     orientation_deg_ -= static_cast<float>(time_elapsed / 1000.0f) * rotation_angle_per_sec_;
+    if (orientation_deg_ < 0.0f)
+        orientation_deg_ += 360.0f;
 }
 
 float Camera::position_x() const

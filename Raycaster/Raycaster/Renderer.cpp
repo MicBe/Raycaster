@@ -1,5 +1,8 @@
 #include "Renderer.h"
 
+#include "Camera.h"
+#include "World.h"
+
 #include "Shader.h"
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -8,8 +11,8 @@
 #include <fstream>
 #include <streambuf>
 
-Renderer::Renderer()
-    : framebuffer_(kFramebufferWidth, kFramebufferHeight),
+Renderer::Renderer(int32_t framebuffer_width, int32_t framebuffer_height)
+    : framebuffer_(framebuffer_width, framebuffer_height),
     textured_quad_shader_(),
     vao_(-1),
     vbo_(-1),
@@ -66,7 +69,7 @@ void Renderer::Init()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, kFramebufferWidth, kFramebufferHeight, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, framebuffer_.Get());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, framebuffer_.width(), framebuffer_.height(), 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, framebuffer_.Get());
 
     /*stbi_image_free(image);*/
 
@@ -76,15 +79,11 @@ void Renderer::Init()
 
 void Renderer::Render()
 {
-    // Draw in framebuffer
-    uint8_t red = 0, green = 0, blue = 255;
-    framebuffer_.DrawHorizontalLine(320, 10, 24, (red << 24) | (green << 16) | (blue << 8));
-
     // Render the framebuffer to texture
     glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, kFramebufferWidth, kFramebufferHeight, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, framebuffer_.Get());
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, framebuffer_.width(), framebuffer_.height(), GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, framebuffer_.Get());
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture_);
 
@@ -93,3 +92,4 @@ void Renderer::Render()
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
+

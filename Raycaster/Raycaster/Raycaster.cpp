@@ -10,7 +10,7 @@ Raycaster::Raycaster()
              kfieldOfView, kHeight,
              kMovementUnitsPerSec),
     world_(kUnitsPerBlock),
-    renderer_()
+    renderer_(kFramebufferWidth, kFramebufferHeight)
 {
 }
 
@@ -40,6 +40,23 @@ void Raycaster::Update(uint32_t delta_ticks)
     std::cout << "Camera x: " << camera_.position_x() << std::endl;
     std::cout << "Camera y: " << camera_.position_y() << std::endl;
     std::cout << "Orientation: " << camera_.orientation_deg() << std::endl;
+
+    const float increment = (camera_.fov() / 2) / kFramebufferWidth;
+    float ray_angle = camera_.orientation_deg() - (camera_.fov() / 2);
+
+    for (int32_t ray_index = 0; ray_index < kFramebufferWidth; ++ray_index)
+    {
+        // Orientation upward?
+        if (camera_.orientation_deg() > 0 && camera_.orientation_deg() <= 180.0f)
+        {
+            float nextX = RoundUpToMultipleOf(camera_.position_x(), world_.units_per_block());
+            float nextY = RoundUpToMultipleOf(camera_.position_y(), world_.units_per_block());
+        }
+
+        // Draw line that corresponds to the distance
+
+        ray_angle += increment;
+    }
 }
 
 void Raycaster::OnKeyDown(SDL_Keycode key)
@@ -52,7 +69,18 @@ void Raycaster::OnKeyUp(SDL_Keycode key)
     std::cout << "Key up: " << key << std::endl;
 }
 
-const float Raycaster::kInitialPosY = 96.0f;
+float Raycaster::RoundUpToMultipleOf(float to_round, int32_t multiple)
+{
+    if (multiple == 0)
+        return to_round;
+    int32_t next_int = ceil(to_round);
+    int32_t remainder = next_int % multiple;
+    if (remainder == 0)
+        return to_round;
+    return static_cast<float>(to_round + multiple - remainder);
+}
+
 const float Raycaster::kInitialPosX = 96.0f;
+const float Raycaster::kInitialPosY = 96.0f;
 const float Raycaster::kInitialPosOrientationDeg = 90.0f;
 const float Raycaster::kMovementUnitsPerSec = 64.0f;

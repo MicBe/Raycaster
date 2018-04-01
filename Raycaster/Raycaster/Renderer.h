@@ -5,11 +5,10 @@
 
 #include <GL/glew.h>
 
-
 class Renderer
 {
 public:
-    Renderer();
+    Renderer(int32_t framebuffer_width, int32_t framebuffer_height);
 
     void Init();
     void Render();
@@ -21,9 +20,5 @@ private:
     GLuint vao_;
     GLuint vbo_;
     GLuint texture_;
-
-private:
-    static const int32_t kFramebufferWidth = 480;
-    static const int32_t kFramebufferHeight = 640;
 };
 

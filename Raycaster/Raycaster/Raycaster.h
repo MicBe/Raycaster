@@ -19,6 +19,9 @@ public:
     virtual void OnKeyUp(SDL_Keycode key) override;
 
 private:
+    float RoundUpToMultipleOf(float to_round, int32_t multiple);
+
+private:
     Camera camera_;
     World world_;
     Renderer renderer_;
@@ -31,5 +34,7 @@ private:
     static const int32_t kHeight = 32;
     static const int32_t kUnitsPerBlock = 64;
     static const float kMovementUnitsPerSec;
+    static const int32_t kFramebufferWidth = 480;
+    static const int32_t kFramebufferHeight = 640;
 };
 
