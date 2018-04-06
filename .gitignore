@@ -13,8 +13,10 @@
 *.userprefs
 
 # Build results
+Raycaster/x64/[Dd]ebug/
 Raycaster/Raycaster/x64/[Dd]ebug/
 [Dd]ebugPublic/
+Raycaster/x64/[Rr]elease/
 Raycaster/Raycaster/x64/[Rr]elease/
 [Rr]eleases/
 Raycaster/Raycaster/x64/
