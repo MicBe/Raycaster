@@ -13,19 +13,16 @@
 *.userprefs
 
 # Build results
-[Dd]ebug/
+Raycaster/Raycaster/x64/[Dd]ebug/
 [Dd]ebugPublic/
-[Rr]elease/
+Raycaster/Raycaster/x64/[Rr]elease/
 [Rr]eleases/
-x64/
-x86/
+Raycaster/Raycaster/x64/
+Raycaster/Raycaster/x86/
 bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
-
-!SDL2-*/
-!glew-*/
 
 # Visual Studio 2015 cache/options directory
 .vs/
