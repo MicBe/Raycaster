@@ -12,6 +12,7 @@ public:
     int32_t units_per_block() const;
 
     int32_t GetBlock(int32_t x, int32_t y) const;
+	bool IsInsideBlock(int32_t x, int32_t y) const;
 
 private:
     size_t size_x_;

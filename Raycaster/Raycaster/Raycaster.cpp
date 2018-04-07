@@ -1,5 +1,6 @@
 #include "Raycaster.h"
 
+#include <glm/glm.hpp>
 #include <SDL.h>
 
 #include <iostream>
@@ -46,17 +47,61 @@ void Raycaster::Update(uint32_t delta_ticks)
 
     for (int32_t ray_index = 0; ray_index < kFramebufferWidth; ++ray_index)
     {
-        // Orientation upward?
-        if (camera_.orientation_deg() > 0 && camera_.orientation_deg() <= 180.0f)
-        {
-            float nextX = RoundUpToMultipleOf(camera_.position_x(), world_.units_per_block());
-            float nextY = RoundUpToMultipleOf(camera_.position_y(), world_.units_per_block());
-        }
+        Ray ray(glm::vec2(camera_.position_x(), camera_.position_y()));
+        const Ray casted_ray = CastRay(ray);
+		if (casted_ray.collided_)
+		{
+            const float distanceX = casted_ray.dest_.x - camera_.position_x();
+            const float distanceY = casted_ray.dest_.y - camera_.position_y();
 
-        // Draw line that corresponds to the distance
+            const float distance = glm::sqrt(glm::pow(distanceX, 2) + glm::pow(distanceY, 2));
+
+			// Draw wall
+		}
 
         ray_angle += increment;
     }
+}
+
+Ray Raycaster::CastRay(const Ray& ray)
+{
+	float ray_x = ray.origin_.x;
+	float ray_y = ray.origin_.y;
+
+    const float nextX = RoundUpToMultipleOf(ray.origin_.x, world_.units_per_block());
+    const float nextY = RoundUpToMultipleOf(ray.origin_.y, world_.units_per_block());
+
+	// Find nearest distance between going to next x or next y
+	const float distanceX = (nextX - camera_.position_x()) / cos(glm::radians(camera_.orientation_deg()));
+	const float distanceY = (nextY - camera_.position_y()) / sin(glm::radians(camera_.orientation_deg()));
+
+	if (distanceX <= distanceY)
+	{
+		// Find new x and y
+
+
+		// Are we at/inside a wall? If so, compute distance else continue tracing ray
+		if (world_.IsInsideBlock(ray_x, ray_y))
+		{
+			//return ray distance
+		}
+		else
+		{
+
+		}
+	}
+    else
+    {
+        ray_x = distanceY / glm::tan(glm::radians(camera_.orientation_deg()));
+        ray_y = nextY;
+    }
+
+	//// Orientation upward?
+	//if (camera_.orientation_deg() > 0 && camera_.orientation_deg() <= 180.0f)
+	//{
+
+	//}
+    return Ray(glm::vec2());
 }
 
 void Raycaster::OnKeyDown(SDL_Keycode key)
@@ -79,6 +124,7 @@ float Raycaster::RoundUpToMultipleOf(float to_round, int32_t multiple)
         return to_round;
     return static_cast<float>(to_round + multiple - remainder);
 }
+
 
 const float Raycaster::kInitialPosX = 96.0f;
 const float Raycaster::kInitialPosY = 96.0f;

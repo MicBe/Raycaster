@@ -3,6 +3,7 @@
 #include "IGameLoop.h"
 
 #include "Camera.h"
+#include "Ray.h"
 #include "Renderer.h"
 #include "World.h"
 
@@ -20,6 +21,7 @@ public:
 
 private:
     float RoundUpToMultipleOf(float to_round, int32_t multiple);
+	Ray CastRay(const Ray& ray);
 
 private:
     Camera camera_;

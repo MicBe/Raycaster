@@ -39,3 +39,11 @@ int32_t World::GetBlock(int32_t x, int32_t y) const
 {
     return world_[y* size_x_ + x];
 }
+
+bool World::IsInsideBlock(int32_t x, int32_t y) const
+{
+	const int32_t nbFullBlocksX = x % size_x();
+	const int32_t nbFullBlocksY = x % size_y();
+
+	return GetBlock(nbFullBlocksX, nbFullBlocksY);
+}

@@ -96,6 +96,7 @@
     <ClCompile Include="IGameLoop.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Ray.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="ShaderProgram.cpp" />
     <ClCompile Include="Raycaster.cpp" />
@@ -109,6 +110,7 @@
     <ClInclude Include="Framebuffer.h" />
     <ClInclude Include="IGameLoop.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Ray.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="ShaderProgram.h" />
     <ClInclude Include="Raycaster.h" />
