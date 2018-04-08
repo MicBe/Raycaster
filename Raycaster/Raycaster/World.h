@@ -13,6 +13,7 @@ public:
 
     int32_t GetBlock(int32_t x, int32_t y) const;
 	bool IsInsideBlock(int32_t x, int32_t y) const;
+    bool IsInside(int32_t x, int32_t y) const;
 
 private:
     size_t size_x_;

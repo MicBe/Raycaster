@@ -37,16 +37,18 @@ void Raycaster::Update(uint32_t delta_ticks)
     if (keyboardState[SDL_SCANCODE_RIGHT])
         camera_.RotateRight(delta_ticks);
 
-    system("cls");
-    std::cout << "Camera x: " << camera_.position_x() << std::endl;
-    std::cout << "Camera y: " << camera_.position_y() << std::endl;
-    std::cout << "Orientation: " << camera_.orientation_deg() << std::endl;
+    //system("cls");
+    //std::cout << "Camera x: " << camera_.position_x() << std::endl;
+    //std::cout << "Camera y: " << camera_.position_y() << std::endl;
+    //std::cout << "Orientation: " << camera_.orientation_deg() << std::endl;
 
     const float increment = (camera_.fov() / 2) / kFramebufferWidth;
     float ray_angle = camera_.orientation_deg() - (camera_.fov() / 2);
 
-    for (int32_t ray_index = 0; ray_index < kFramebufferWidth; ++ray_index)
+    for (int32_t ray_index = 0; ray_index < kFramebufferHeight; ++ray_index)
     {
+        DrawCenteredHorizontalLine(ray_index, kFramebufferWidth * ((float)ray_index / (float)kFramebufferHeight));
+        
         Ray ray(glm::vec2(camera_.position_x(), camera_.position_y()));
         const Ray casted_ray = CastRay(ray);
 		if (casted_ray.collided_)
@@ -65,43 +67,42 @@ void Raycaster::Update(uint32_t delta_ticks)
 
 Ray Raycaster::CastRay(const Ray& ray)
 {
-	float ray_x = ray.origin_.x;
-	float ray_y = ray.origin_.y;
-
-    const float nextX = RoundUpToMultipleOf(ray.origin_.x, world_.units_per_block());
-    const float nextY = RoundUpToMultipleOf(ray.origin_.y, world_.units_per_block());
-
-	// Find nearest distance between going to next x or next y
-	const float distanceX = (nextX - camera_.position_x()) / cos(glm::radians(camera_.orientation_deg()));
-	const float distanceY = (nextY - camera_.position_y()) / sin(glm::radians(camera_.orientation_deg()));
-
-	if (distanceX <= distanceY)
-	{
-		// Find new x and y
-
-
-		// Are we at/inside a wall? If so, compute distance else continue tracing ray
-		if (world_.IsInsideBlock(ray_x, ray_y))
-		{
-			//return ray distance
-		}
-		else
-		{
-
-		}
-	}
-    else
+    Ray result(ray);
+	float pos_x = ray.origin_.x;
+	float pos_y = ray.origin_.y;
+    do 
     {
-        ray_x = distanceY / glm::tan(glm::radians(camera_.orientation_deg()));
-        ray_y = nextY;
-    }
+        const float next_x = RoundUpToMultipleOf(pos_x, world_.units_per_block());
+        const float next_y = RoundUpToMultipleOf(pos_y, world_.units_per_block());
 
-	//// Orientation upward?
-	//if (camera_.orientation_deg() > 0 && camera_.orientation_deg() <= 180.0f)
-	//{
+        // Find nearest distance between going to next x or next y
+        const float dist_x = (next_x - pos_x) / cos(glm::radians(camera_.orientation_deg()));
+        const float dist_y = (next_y - pos_y) / sin(glm::radians(camera_.orientation_deg()));
 
-	//}
-    return Ray(glm::vec2());
+        if (dist_x <= dist_y)
+        {
+            // Next x has nearest distance?
+            pos_y = glm::tan(glm::radians(camera_.orientation_deg())) * (next_x - pos_x);
+            pos_x = next_x;
+        }
+        else
+        {
+            // Next y has nearest distance?
+            pos_x = next_y - pos_y / glm::tan(glm::radians(camera_.orientation_deg()));
+            pos_y = next_y;
+        }
+
+        if (world_.IsInsideBlock(pos_x, pos_y))
+        {
+            result.collided_ = true;
+            result.dest_.x = pos_x;
+            result.dest_.y = pos_y;
+            return result;
+        }
+
+    } while (world_.IsInside(pos_x, pos_y));
+
+    return result;
 }
 
 void Raycaster::OnKeyDown(SDL_Keycode key)
@@ -112,6 +113,16 @@ void Raycaster::OnKeyDown(SDL_Keycode key)
 void Raycaster::OnKeyUp(SDL_Keycode key)
 {
     std::cout << "Key up: " << key << std::endl;
+}
+
+void Raycaster::DrawCenteredHorizontalLine(uint32_t y, uint32_t length)
+{
+    Framebuffer& framebuf = renderer_.GetFrameBuffer();
+
+    const uint32_t start_pos = framebuf.width() / 2 - (length / 2);
+    const uint32_t end_pos = start_pos + length;
+
+    framebuf.DrawHorizontalLine(y, start_pos, end_pos, 0x00ff000000);
 }
 
 float Raycaster::RoundUpToMultipleOf(float to_round, int32_t multiple)

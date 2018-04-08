@@ -12,6 +12,9 @@ public:
 
     void Init();
     void Render();
+    
+    Framebuffer& GetFrameBuffer();
+    const Framebuffer& GetFrameBuffer() const;
 
 private:
     Framebuffer framebuffer_;

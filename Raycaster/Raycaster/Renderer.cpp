@@ -93,3 +93,13 @@ void Renderer::Render()
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
+Framebuffer& Renderer::GetFrameBuffer()
+{
+    return framebuffer_;
+}
+
+const Framebuffer& Renderer::GetFrameBuffer() const
+{
+    return framebuffer_;
+}
+

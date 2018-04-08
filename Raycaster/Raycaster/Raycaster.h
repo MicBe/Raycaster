@@ -20,6 +20,7 @@ public:
     virtual void OnKeyUp(SDL_Keycode key) override;
 
 private:
+    void DrawCenteredHorizontalLine(uint32_t y, uint32_t length);
     float RoundUpToMultipleOf(float to_round, int32_t multiple);
 	Ray CastRay(const Ray& ray);
 
