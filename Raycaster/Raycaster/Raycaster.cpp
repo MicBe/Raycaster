@@ -37,19 +37,19 @@ void Raycaster::Update(uint32_t delta_ticks)
     if (keyboardState[SDL_SCANCODE_RIGHT])
         camera_.RotateRight(delta_ticks);
 
-    //system("cls");
-    //std::cout << "Camera x: " << camera_.position_x() << std::endl;
-    //std::cout << "Camera y: " << camera_.position_y() << std::endl;
-    //std::cout << "Orientation: " << camera_.orientation_deg() << std::endl;
+    system("cls");
+    std::cout << "Camera x: " << camera_.position_x() << std::endl;
+    std::cout << "Camera y: " << camera_.position_y() << std::endl;
+    std::cout << "Orientation: " << camera_.orientation_deg() << std::endl;
 
-    const float increment = (camera_.fov() / 2) / kFramebufferWidth;
+    const float increment = static_cast<float>(camera_.fov()) / static_cast<float>(kFramebufferHeight);
     float ray_angle = camera_.orientation_deg() - (camera_.fov() / 2);
 
     for (int32_t ray_index = 0; ray_index < kFramebufferHeight; ++ray_index)
     {
         DrawCenteredHorizontalLine(ray_index, kFramebufferWidth * ((float)ray_index / (float)kFramebufferHeight));
         
-        Ray ray(glm::vec2(camera_.position_x(), camera_.position_y()));
+        Ray ray(glm::vec2(camera_.position_x(), camera_.position_y()), ray_angle);
         const Ray casted_ray = CastRay(ray);
 		if (casted_ray.collided_)
 		{
@@ -76,19 +76,19 @@ Ray Raycaster::CastRay(const Ray& ray)
         const float next_y = RoundUpToMultipleOf(pos_y, world_.units_per_block());
 
         // Find nearest distance between going to next x or next y
-        const float dist_x = (next_x - pos_x) / cos(glm::radians(camera_.orientation_deg()));
-        const float dist_y = (next_y - pos_y) / sin(glm::radians(camera_.orientation_deg()));
+        const float dist_x = (next_x - pos_x) / cos(glm::radians(ray.angle_));
+        const float dist_y = (next_y - pos_y) / sin(glm::radians(ray.angle_));
 
         if (dist_x <= dist_y)
         {
             // Next x has nearest distance?
-            pos_y = glm::tan(glm::radians(camera_.orientation_deg())) * (next_x - pos_x);
+            pos_y = pos_y + (dist_x * glm::sin(glm::radians(ray.angle_)));
             pos_x = next_x;
         }
         else
         {
             // Next y has nearest distance?
-            pos_x = next_y - pos_y / glm::tan(glm::radians(camera_.orientation_deg()));
+            pos_x = pos_x + (dist_y * glm::cos(glm::radians(ray.angle_)));
             pos_y = next_y;
         }
 
@@ -100,7 +100,7 @@ Ray Raycaster::CastRay(const Ray& ray)
             return result;
         }
 
-    } while (world_.IsInside(pos_x, pos_y));
+    } while (world_.IsInside(pos_x, pos_y) && !result.collided_);
 
     return result;
 }
@@ -136,6 +136,12 @@ float Raycaster::RoundUpToMultipleOf(float to_round, int32_t multiple)
     return static_cast<float>(to_round + multiple - remainder);
 }
 
+
+float Raycaster::RoundDownToMultipleOf(float to_round, int32_t multiple)
+{
+    int32_t next_int = floor(to_round);
+    return (next_int / multiple) * multiple;
+}
 
 const float Raycaster::kInitialPosX = 96.0f;
 const float Raycaster::kInitialPosY = 96.0f;
