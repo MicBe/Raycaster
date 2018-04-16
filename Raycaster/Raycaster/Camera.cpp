@@ -72,7 +72,7 @@ std::pair<float, float> Camera::GetDeltaMove(int32_t time_elapsed) const
     const float move_coeff = movement_units_per_sec_ * static_cast<float>(time_elapsed / 1000.0f);
 
     float delta_x = cos(glm::radians(orientation_deg_)) * move_coeff;
-    float delta_y = sin(glm::radians(orientation_deg_)) * move_coeff;
+    float delta_y = -sin(glm::radians(orientation_deg_)) * move_coeff;
 
     return std::make_pair(delta_x, delta_y);
 }

@@ -56,7 +56,6 @@ void Raycaster::Update(uint32_t delta_ticks)
             const float distance = glm::sqrt(glm::pow(casted_ray.dest_.x - camera_.position_x(), 2) + glm::pow(casted_ray.dest_.y - camera_.position_y(), 2));
 
 			// Draw wall
-            float length = (static_cast<float>(world_.units_per_block()) / distance) * 554.0f;
             DrawCenteredHorizontalLine(ray_index, glm::clamp((static_cast<float>(world_.units_per_block()) / distance) * 554.0f, 0.0f, 480.0f));
 		}
 
@@ -71,8 +70,10 @@ Ray Raycaster::CastRay(const Ray& ray)
     bool ray_facing_up = ray.angle_ > 0.0f && ray.angle_ < 180.0f;
     bool ray_facing_left = ray.angle_ > 90.0f && ray.angle_ < 270.0f;
 
-    const int32_t horiz_increment_x = static_cast<float>((float)world_.units_per_block()) / glm::tan(glm::radians(ray.angle_));
-    const int32_t horiz_increment_y = static_cast<float>((float)world_.units_per_block()) * -static_cast<float>(ray_facing_up);
+    const int32_t horiz_increment_x = static_cast<float>(world_.units_per_block()) / glm::tan(glm::radians(ray.angle_));
+    int32_t horiz_increment_y = static_cast<float>(world_.units_per_block());
+    if (ray_facing_up)
+        horiz_increment_y *= -1;
 
     int32_t horiz_pos_x = ray.origin_.x;
     int32_t horiz_pos_y = ray.origin_.y;
@@ -80,22 +81,29 @@ Ray Raycaster::CastRay(const Ray& ray)
     int32_t horiz_intersect_x = 0;
     int32_t horiz_intersect_y = 0;
 
+    if (ray_facing_up)
+        horiz_intersect_y = RoundDownToMultipleOf(horiz_pos_y, kUnitsPerBlock) - 1; // Y intersect is slightly above the line
+    else
+        horiz_intersect_y = RoundDownToMultipleOf(horiz_pos_y, kUnitsPerBlock) + world_.units_per_block(); // Y intersect is slightly below the line
+    horiz_intersect_x = horiz_pos_x + ((horiz_pos_y - horiz_intersect_y) / glm::tan(glm::radians(ray.angle_)));
+
     // Checking for horizontal intersections
+    horiz_pos_x = horiz_intersect_x;
+    horiz_pos_y = horiz_intersect_y;
     do 
     {
-        if (ray_facing_up)
-            horiz_intersect_y = RoundDownToMultipleOf(horiz_pos_y, kUnitsPerBlock) - 1; // Y intersect is slightly above the line
-        else
-            horiz_intersect_y = RoundDownToMultipleOf(horiz_pos_y, kUnitsPerBlock) + world_.units_per_block(); // Y intersect is slightly below the line
-        horiz_intersect_x = horiz_pos_x + ((horiz_pos_y - horiz_intersect_y) / glm::tan(glm::radians(ray.angle_)));
-        
-        horiz_pos_x = horiz_intersect_x;
-        horiz_pos_y = horiz_intersect_y;
         if (world_.IsInsideBlock(horiz_pos_x, horiz_pos_y))
             result.collided_ = true;
+        else
+        {
+            horiz_pos_x += horiz_increment_x;
+            horiz_pos_y += horiz_increment_y;
+        }
     } while (!result.collided_ && world_.IsInsideWorld(horiz_pos_x, horiz_pos_y));
 
-    const int32_t vert_increment_x = static_cast<float>(world_.units_per_block()) * static_cast<float>(-ray_facing_left);
+    int32_t vert_increment_x = static_cast<float>(world_.units_per_block());
+    if (ray_facing_left)
+        vert_increment_x *= -1;
     const int32_t vert_increment_y = static_cast<float>(world_.units_per_block()) * glm::tan(glm::radians(ray.angle_));
 
     int32_t vert_pos_x = ray.origin_.x;
@@ -105,23 +113,28 @@ Ray Raycaster::CastRay(const Ray& ray)
     int32_t vert_intersect_y = 0;
 
     // Checking for vertical intersections
+    if (ray_facing_left)
+        vert_intersect_x = RoundDownToMultipleOf(vert_pos_x, world_.units_per_block()) - 1;
+    else
+        vert_intersect_x = RoundDownToMultipleOf(vert_pos_x, world_.units_per_block()) + world_.units_per_block();
+    vert_intersect_y = vert_pos_x + (glm::tan(glm::radians(ray.angle_)) * (vert_pos_x - vert_intersect_x));
+
+    vert_pos_x = vert_intersect_x;
+    vert_pos_y = vert_intersect_y;
     do 
     {
-        if (ray_facing_left)
-            vert_intersect_x = RoundDownToMultipleOf(vert_pos_x, world_.units_per_block()) - 1;
-        else
-            vert_intersect_x = RoundDownToMultipleOf(vert_pos_x, world_.units_per_block()) + world_.units_per_block();
-        vert_intersect_y = vert_pos_x + (glm::tan(glm::radians(ray.angle_)) * (vert_pos_x - vert_intersect_x));
-
-        vert_pos_x = vert_intersect_x;
-        vert_pos_y = vert_intersect_y;
         if (world_.IsInsideBlock(vert_pos_x, vert_pos_y))
             result.collided_ = true;
+        else
+        {
+            vert_pos_x += vert_increment_x;
+            vert_pos_y += vert_increment_y;
+        }
 
     } while (!result.collided_ && world_.IsInsideWorld(vert_pos_x, vert_pos_y));
 
-    int32_t dist_intersect_horiz = glm::sqrt(glm::pow(glm::abs(horiz_pos_x - ray.origin_.x), 2) + glm::pow(glm::abs(horiz_pos_y - ray.origin_.y), 2));
-    int32_t dist_intersect_vert = glm::sqrt(glm::pow(glm::abs(vert_pos_x - ray.origin_.x), 2) + glm::pow(glm::abs(vert_pos_y - ray.origin_.y), 2));
+    int32_t dist_intersect_horiz = glm::sqrt(glm::pow(ray.origin_.x - horiz_pos_x, 2) + glm::pow(ray.origin_.y - horiz_pos_y, 2));
+    int32_t dist_intersect_vert = glm::sqrt(glm::pow(ray.origin_.x - vert_pos_x, 2) + glm::pow(ray.origin_.y - vert_pos_y, 2));
 
     result.dest_ = dist_intersect_horiz < dist_intersect_vert ? glm::vec2(horiz_pos_x, horiz_pos_y) : glm::vec2(vert_pos_x, vert_pos_y);
 
