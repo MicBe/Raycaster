@@ -11,9 +11,11 @@ public:
     size_t size_y() const;
     int32_t units_per_block() const;
 
-    int32_t GetBlock(int32_t x, int32_t y) const;
 	bool IsInsideBlock(int32_t x, int32_t y) const;
-    bool IsInside(int32_t x, int32_t y) const;
+    bool IsInsideWorld(int32_t x, int32_t y) const;
+
+private:
+    int32_t GetBlock(int32_t x, int32_t y) const;
 
 private:
     size_t size_x_;

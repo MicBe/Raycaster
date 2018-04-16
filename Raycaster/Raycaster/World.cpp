@@ -11,7 +11,7 @@ World::World(int32_t units_per_block)
         1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
         1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
         1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
-        1, 0, 1, 0, 1, 0, 1, 0, 1, 1,
+        1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
         1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
         1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
         1, 0, 0, 0, 0, 0, 0, 0, 0, 1,
@@ -37,23 +37,18 @@ int32_t World::units_per_block() const
 
 int32_t World::GetBlock(int32_t x, int32_t y) const
 {
-    if (x >= size_x() || y >= size_y())
+    if (x < 0 || x >= size_x() || y < 0 || y >= size_y())
         return 0;
-    return world_[y* size_x_ + x];
+    return world_[y* size_x() + x];
 }
 
 bool World::IsInsideBlock(int32_t x, int32_t y) const
 {
-	const int32_t nbFullBlocksX = x / units_per_block();
-	const int32_t nbFullBlocksY = y / units_per_block();
-
-	return GetBlock(nbFullBlocksX, nbFullBlocksY);
+    return GetBlock(x / units_per_block(), y / units_per_block());
 }
 
-bool World::IsInside(int32_t x, int32_t y) const
+bool World::IsInsideWorld(int32_t x, int32_t y) const
 {
-    const int32_t nbFullBlocksX = x / size_x();
-    const int32_t nbFullBlocksY = y / size_y();
-
-    return nbFullBlocksX < size_x() && nbFullBlocksY < size_y();
+    return x >= 0 && x < (size_x() * units_per_block()) && y >= 0 && y < (size_y() * units_per_block());
 }
+

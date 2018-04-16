@@ -41,66 +41,89 @@ void Raycaster::Update(uint32_t delta_ticks)
     std::cout << "Camera x: " << camera_.position_x() << std::endl;
     std::cout << "Camera y: " << camera_.position_y() << std::endl;
     std::cout << "Orientation: " << camera_.orientation_deg() << std::endl;
+    
+    renderer_.GetFrameBuffer().Fill(0);
 
     const float increment = static_cast<float>(camera_.fov()) / static_cast<float>(kFramebufferHeight);
-    float ray_angle = camera_.orientation_deg() - (camera_.fov() / 2);
+    float ray_angle = camera_.orientation_deg() + (camera_.fov() / 2);
 
     for (int32_t ray_index = 0; ray_index < kFramebufferHeight; ++ray_index)
     {
-        DrawCenteredHorizontalLine(ray_index, kFramebufferWidth * ((float)ray_index / (float)kFramebufferHeight));
-        
         Ray ray(glm::vec2(camera_.position_x(), camera_.position_y()), ray_angle);
         const Ray casted_ray = CastRay(ray);
 		if (casted_ray.collided_)
 		{
-            const float distanceX = casted_ray.dest_.x - camera_.position_x();
-            const float distanceY = casted_ray.dest_.y - camera_.position_y();
-
-            const float distance = glm::sqrt(glm::pow(distanceX, 2) + glm::pow(distanceY, 2));
+            const float distance = glm::sqrt(glm::pow(casted_ray.dest_.x - camera_.position_x(), 2) + glm::pow(casted_ray.dest_.y - camera_.position_y(), 2));
 
 			// Draw wall
+            float length = (static_cast<float>(world_.units_per_block()) / distance) * 554.0f;
+            DrawCenteredHorizontalLine(ray_index, glm::clamp((static_cast<float>(world_.units_per_block()) / distance) * 554.0f, 0.0f, 480.0f));
 		}
 
-        ray_angle += increment;
+        ray_angle -= increment;
     }
 }
 
 Ray Raycaster::CastRay(const Ray& ray)
 {
     Ray result(ray);
-	float pos_x = ray.origin_.x;
-	float pos_y = ray.origin_.y;
+
+    bool ray_facing_up = ray.angle_ > 0.0f && ray.angle_ < 180.0f;
+    bool ray_facing_left = ray.angle_ > 90.0f && ray.angle_ < 270.0f;
+
+    const int32_t horiz_increment_x = static_cast<float>((float)world_.units_per_block()) / glm::tan(glm::radians(ray.angle_));
+    const int32_t horiz_increment_y = static_cast<float>((float)world_.units_per_block()) * -static_cast<float>(ray_facing_up);
+
+    int32_t horiz_pos_x = ray.origin_.x;
+    int32_t horiz_pos_y = ray.origin_.y;
+
+    int32_t horiz_intersect_x = 0;
+    int32_t horiz_intersect_y = 0;
+
+    // Checking for horizontal intersections
     do 
     {
-        const float next_x = RoundUpToMultipleOf(pos_x, world_.units_per_block());
-        const float next_y = RoundUpToMultipleOf(pos_y, world_.units_per_block());
-
-        // Find nearest distance between going to next x or next y
-        const float dist_x = (next_x - pos_x) / cos(glm::radians(ray.angle_));
-        const float dist_y = (next_y - pos_y) / sin(glm::radians(ray.angle_));
-
-        if (dist_x <= dist_y)
-        {
-            // Next x has nearest distance?
-            pos_y = pos_y + (dist_x * glm::sin(glm::radians(ray.angle_)));
-            pos_x = next_x;
-        }
+        if (ray_facing_up)
+            horiz_intersect_y = RoundDownToMultipleOf(horiz_pos_y, kUnitsPerBlock) - 1; // Y intersect is slightly above the line
         else
-        {
-            // Next y has nearest distance?
-            pos_x = pos_x + (dist_y * glm::cos(glm::radians(ray.angle_)));
-            pos_y = next_y;
-        }
-
-        if (world_.IsInsideBlock(pos_x, pos_y))
-        {
+            horiz_intersect_y = RoundDownToMultipleOf(horiz_pos_y, kUnitsPerBlock) + world_.units_per_block(); // Y intersect is slightly below the line
+        horiz_intersect_x = horiz_pos_x + ((horiz_pos_y - horiz_intersect_y) / glm::tan(glm::radians(ray.angle_)));
+        
+        horiz_pos_x = horiz_intersect_x;
+        horiz_pos_y = horiz_intersect_y;
+        if (world_.IsInsideBlock(horiz_pos_x, horiz_pos_y))
             result.collided_ = true;
-            result.dest_.x = pos_x;
-            result.dest_.y = pos_y;
-            return result;
-        }
+    } while (!result.collided_ && world_.IsInsideWorld(horiz_pos_x, horiz_pos_y));
 
-    } while (world_.IsInside(pos_x, pos_y) && !result.collided_);
+    const int32_t vert_increment_x = static_cast<float>(world_.units_per_block()) * static_cast<float>(-ray_facing_left);
+    const int32_t vert_increment_y = static_cast<float>(world_.units_per_block()) * glm::tan(glm::radians(ray.angle_));
+
+    int32_t vert_pos_x = ray.origin_.x;
+    int32_t vert_pos_y = ray.origin_.y;
+
+    int32_t vert_intersect_x = 0;
+    int32_t vert_intersect_y = 0;
+
+    // Checking for vertical intersections
+    do 
+    {
+        if (ray_facing_left)
+            vert_intersect_x = RoundDownToMultipleOf(vert_pos_x, world_.units_per_block()) - 1;
+        else
+            vert_intersect_x = RoundDownToMultipleOf(vert_pos_x, world_.units_per_block()) + world_.units_per_block();
+        vert_intersect_y = vert_pos_x + (glm::tan(glm::radians(ray.angle_)) * (vert_pos_x - vert_intersect_x));
+
+        vert_pos_x = vert_intersect_x;
+        vert_pos_y = vert_intersect_y;
+        if (world_.IsInsideBlock(vert_pos_x, vert_pos_y))
+            result.collided_ = true;
+
+    } while (!result.collided_ && world_.IsInsideWorld(vert_pos_x, vert_pos_y));
+
+    int32_t dist_intersect_horiz = glm::sqrt(glm::pow(glm::abs(horiz_pos_x - ray.origin_.x), 2) + glm::pow(glm::abs(horiz_pos_y - ray.origin_.y), 2));
+    int32_t dist_intersect_vert = glm::sqrt(glm::pow(glm::abs(vert_pos_x - ray.origin_.x), 2) + glm::pow(glm::abs(vert_pos_y - ray.origin_.y), 2));
+
+    result.dest_ = dist_intersect_horiz < dist_intersect_vert ? glm::vec2(horiz_pos_x, horiz_pos_y) : glm::vec2(vert_pos_x, vert_pos_y);
 
     return result;
 }
@@ -137,13 +160,12 @@ float Raycaster::RoundUpToMultipleOf(float to_round, int32_t multiple)
 }
 
 
-float Raycaster::RoundDownToMultipleOf(float to_round, int32_t multiple)
+int32_t Raycaster::RoundDownToMultipleOf(float to_round, int32_t multiple)
 {
-    int32_t next_int = floor(to_round);
-    return (next_int / multiple) * multiple;
+    return glm::floor(to_round / static_cast<float>(multiple)) * multiple;
 }
 
 const float Raycaster::kInitialPosX = 96.0f;
-const float Raycaster::kInitialPosY = 96.0f;
-const float Raycaster::kInitialPosOrientationDeg = 90.0f;
+const float Raycaster::kInitialPosY = 160.0f;
+const float Raycaster::kInitialPosOrientationDeg = 45.0f;
 const float Raycaster::kMovementUnitsPerSec = 64.0f;
