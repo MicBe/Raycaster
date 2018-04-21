@@ -53,10 +53,10 @@ void Raycaster::Update(uint32_t delta_ticks)
         const Ray casted_ray = CastRay(ray);
 		if (casted_ray.collided_)
 		{
-            const float distance = glm::sqrt(glm::pow(casted_ray.dest_.x - camera_.position_x(), 2) + glm::pow(casted_ray.dest_.y - camera_.position_y(), 2));
+            const float distorted_dist = glm::sqrt(glm::pow(casted_ray.dest_.x - camera_.position_x(), 2) + glm::pow(casted_ray.dest_.y - camera_.position_y(), 2));
 
 			// Draw wall
-            DrawCenteredHorizontalLine(ray_index, glm::clamp((static_cast<float>(world_.units_per_block()) / distance) * 554.0f, 0.0f, 480.0f));
+            DrawCenteredHorizontalLine(ray_index, glm::clamp((static_cast<float>(world_.units_per_block()) / distorted_dist) * 554.0f, 0.0f, 480.0f));
 		}
 
         ray_angle -= increment;
@@ -85,21 +85,23 @@ Ray Raycaster::CastRay(const Ray& ray)
         horiz_intersect_y = RoundDownToMultipleOf(horiz_pos_y, kUnitsPerBlock) - 1; // Y intersect is slightly above the line
     else
         horiz_intersect_y = RoundDownToMultipleOf(horiz_pos_y, kUnitsPerBlock) + world_.units_per_block(); // Y intersect is slightly below the line
+
     horiz_intersect_x = horiz_pos_x + ((horiz_pos_y - horiz_intersect_y) / glm::tan(glm::radians(ray.angle_)));
 
     // Checking for horizontal intersections
     horiz_pos_x = horiz_intersect_x;
     horiz_pos_y = horiz_intersect_y;
+    bool collided_horiz = false;
     do 
     {
         if (world_.IsInsideBlock(horiz_pos_x, horiz_pos_y))
-            result.collided_ = true;
+            collided_horiz = true;
         else
         {
             horiz_pos_x += horiz_increment_x;
             horiz_pos_y += horiz_increment_y;
         }
-    } while (!result.collided_ && world_.IsInsideWorld(horiz_pos_x, horiz_pos_y));
+    } while (!collided_horiz && world_.IsInsideWorld(horiz_pos_x, horiz_pos_y));
 
     int32_t vert_increment_x = static_cast<float>(world_.units_per_block());
     if (ray_facing_left)
@@ -117,26 +119,37 @@ Ray Raycaster::CastRay(const Ray& ray)
         vert_intersect_x = RoundDownToMultipleOf(vert_pos_x, world_.units_per_block()) - 1;
     else
         vert_intersect_x = RoundDownToMultipleOf(vert_pos_x, world_.units_per_block()) + world_.units_per_block();
+
     vert_intersect_y = vert_pos_x + (glm::tan(glm::radians(ray.angle_)) * (vert_pos_x - vert_intersect_x));
 
     vert_pos_x = vert_intersect_x;
     vert_pos_y = vert_intersect_y;
+    bool collided_vert = false;
     do 
     {
         if (world_.IsInsideBlock(vert_pos_x, vert_pos_y))
-            result.collided_ = true;
+            collided_vert = true;
         else
         {
             vert_pos_x += vert_increment_x;
             vert_pos_y += vert_increment_y;
         }
 
-    } while (!result.collided_ && world_.IsInsideWorld(vert_pos_x, vert_pos_y));
+    } while (!collided_vert && world_.IsInsideWorld(vert_pos_x, vert_pos_y));
 
     int32_t dist_intersect_horiz = glm::sqrt(glm::pow(ray.origin_.x - horiz_pos_x, 2) + glm::pow(ray.origin_.y - horiz_pos_y, 2));
     int32_t dist_intersect_vert = glm::sqrt(glm::pow(ray.origin_.x - vert_pos_x, 2) + glm::pow(ray.origin_.y - vert_pos_y, 2));
 
-    result.dest_ = dist_intersect_horiz < dist_intersect_vert ? glm::vec2(horiz_pos_x, horiz_pos_y) : glm::vec2(vert_pos_x, vert_pos_y);
+    if (dist_intersect_horiz < dist_intersect_vert)
+    {
+        result.collided_ = collided_horiz;
+        result.dest_ = glm::vec2(horiz_pos_x, horiz_pos_y);
+    }
+    else
+    {
+        result.collided_ = collided_vert;
+        result.dest_ = glm::vec2(vert_pos_x, vert_pos_y);
+    }
 
     return result;
 }
@@ -178,7 +191,7 @@ int32_t Raycaster::RoundDownToMultipleOf(float to_round, int32_t multiple)
     return glm::floor(to_round / static_cast<float>(multiple)) * multiple;
 }
 
-const float Raycaster::kInitialPosX = 96.0f;
-const float Raycaster::kInitialPosY = 160.0f;
-const float Raycaster::kInitialPosOrientationDeg = 45.0f;
+const float Raycaster::kInitialPosX = 320.0f;
+const float Raycaster::kInitialPosY = 320.0f;
+const float Raycaster::kInitialPosOrientationDeg = 90.0f;
 const float Raycaster::kMovementUnitsPerSec = 64.0f;
