@@ -57,6 +57,8 @@ void Raycaster::Update(uint32_t delta_ticks)
             const float corrected_dist = glm::cos(glm::radians(glm::abs(camera_.orientation_deg() - ray_angle))) * distorted_dist;
 
 			// Draw wall
+            uint32_t stripe_length = (static_cast<float>(world_.units_per_block()) / corrected_dist) * 554.0f;
+            //assert(stripe_length <= 480);
             DrawStripe(ray_index, glm::clamp((static_cast<float>(world_.units_per_block()) / corrected_dist) * 554.0f, 0.0f, 480.0f));
 		}
 
@@ -68,8 +70,8 @@ Ray Raycaster::CastRay(const Ray& ray)
 {
     Ray result(ray);
 
-    bool ray_facing_up = ray.angle_ > 0.0f && ray.angle_ < 180.0f;
-    bool ray_facing_left = ray.angle_ > 90.0f && ray.angle_ < 270.0f;
+    bool ray_facing_up = ray.angle_ > 0.0f && ray.angle_ <= 180.0f;
+    bool ray_facing_left = ray.angle_ > 90.0f && ray.angle_ <= 270.0f;
 
     const int32_t horiz_increment_x = static_cast<float>(world_.units_per_block()) / glm::tan(glm::radians(ray.angle_));
     int32_t horiz_increment_y = static_cast<float>(world_.units_per_block());
@@ -126,7 +128,7 @@ Ray Raycaster::CastRay(const Ray& ray)
     else
         vert_intersect_x = RoundDownToMultipleOf(vert_pos_x, world_.units_per_block()) + world_.units_per_block();
 
-    vert_intersect_y = vert_pos_x + (glm::tan(glm::radians(ray.angle_)) * (vert_pos_x - vert_intersect_x));
+    vert_intersect_y = vert_pos_y + (glm::tan(glm::radians(ray.angle_)) * (vert_pos_x - vert_intersect_x));
 
     vert_pos_x = vert_intersect_x;
     vert_pos_y = vert_intersect_y;
@@ -206,10 +208,11 @@ float Raycaster::RoundUpToMultipleOf(float to_round, int32_t multiple)
 
 int32_t Raycaster::RoundDownToMultipleOf(float to_round, int32_t multiple)
 {
-    return glm::floor(to_round / static_cast<float>(multiple)) * multiple;
+    float floored = glm::floor(to_round / static_cast<float>(multiple));
+    return floored * multiple;
 }
 
-const float Raycaster::kInitialPosX = 512.571f;
-const float Raycaster::kInitialPosY = 264.619f;
-const float Raycaster::kInitialPosOrientationDeg = 5.93997f;
+const float Raycaster::kInitialPosX = 504.791f;
+const float Raycaster::kInitialPosY = 263.786f;
+const float Raycaster::kInitialPosOrientationDeg = 16.92f;
 const float Raycaster::kMovementUnitsPerSec = 64.0f;
