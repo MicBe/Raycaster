@@ -54,9 +54,10 @@ void Raycaster::Update(uint32_t delta_ticks)
 		if (casted_ray.collided_)
 		{
             const float distorted_dist = glm::sqrt(glm::pow(casted_ray.dest_.x - camera_.position_x(), 2) + glm::pow(casted_ray.dest_.y - camera_.position_y(), 2));
+            const float corrected_dist = glm::cos(glm::radians(glm::abs(camera_.orientation_deg() - ray_angle))) * distorted_dist;
 
 			// Draw wall
-            DrawCenteredHorizontalLine(ray_index, glm::clamp((static_cast<float>(world_.units_per_block()) / distorted_dist) * 554.0f, 0.0f, 480.0f));
+            DrawStripe(ray_index, glm::clamp((static_cast<float>(world_.units_per_block()) / corrected_dist) * 554.0f, 0.0f, 480.0f));
 		}
 
         ray_angle -= increment;
@@ -98,10 +99,15 @@ Ray Raycaster::CastRay(const Ray& ray)
             collided_horiz = true;
         else
         {
-            horiz_pos_x += horiz_increment_x;
-            horiz_pos_y += horiz_increment_y;
+            if (world_.IsInsideWorld(horiz_pos_x, horiz_pos_y))
+            {
+                horiz_pos_x += horiz_increment_x;
+                horiz_pos_y += horiz_increment_y;
+            }
+            else
+                break;
         }
-    } while (!collided_horiz && world_.IsInsideWorld(horiz_pos_x, horiz_pos_y));
+    } while (!collided_horiz);
 
     int32_t vert_increment_x = static_cast<float>(world_.units_per_block());
     if (ray_facing_left)
@@ -131,25 +137,37 @@ Ray Raycaster::CastRay(const Ray& ray)
             collided_vert = true;
         else
         {
-            vert_pos_x += vert_increment_x;
-            vert_pos_y += vert_increment_y;
+            if (world_.IsInsideWorld(vert_pos_x, vert_pos_y))
+            {
+                vert_pos_x += vert_increment_x;
+                vert_pos_y += vert_increment_y;
+            }
+            else
+                break;
         }
 
-    } while (!collided_vert && world_.IsInsideWorld(vert_pos_x, vert_pos_y));
+    } while (!collided_vert);
 
-    int32_t dist_intersect_horiz = glm::sqrt(glm::pow(ray.origin_.x - horiz_pos_x, 2) + glm::pow(ray.origin_.y - horiz_pos_y, 2));
-    int32_t dist_intersect_vert = glm::sqrt(glm::pow(ray.origin_.x - vert_pos_x, 2) + glm::pow(ray.origin_.y - vert_pos_y, 2));
+    if (collided_horiz || collided_vert)
+    {
+        result.collided_ = true;
 
-    if (dist_intersect_horiz < dist_intersect_vert)
-    {
-        result.collided_ = collided_horiz;
-        result.dest_ = glm::vec2(horiz_pos_x, horiz_pos_y);
+        int32_t dist_intersect_horiz = glm::sqrt(glm::pow(ray.origin_.x - horiz_pos_x, 2) + glm::pow(ray.origin_.y - horiz_pos_y, 2));
+        int32_t dist_intersect_vert = glm::sqrt(glm::pow(ray.origin_.x - vert_pos_x, 2) + glm::pow(ray.origin_.y - vert_pos_y, 2));
+
+        if (dist_intersect_horiz < dist_intersect_vert)
+        {
+            //assert(dist_intersect_horiz >= 1.0f);
+            result.dest_ = glm::vec2(horiz_pos_x, horiz_pos_y);
+        }
+        else
+        {
+            //assert(dist_intersect_vert >= 1.0f);
+            result.dest_ = glm::vec2(vert_pos_x, vert_pos_y);
+        }
     }
-    else
-    {
-        result.collided_ = collided_vert;
-        result.dest_ = glm::vec2(vert_pos_x, vert_pos_y);
-    }
+
+    //assert(result.collided_);
 
     return result;
 }
@@ -164,7 +182,7 @@ void Raycaster::OnKeyUp(SDL_Keycode key)
     std::cout << "Key up: " << key << std::endl;
 }
 
-void Raycaster::DrawCenteredHorizontalLine(uint32_t y, uint32_t length)
+void Raycaster::DrawStripe(uint32_t y, uint32_t length)
 {
     Framebuffer& framebuf = renderer_.GetFrameBuffer();
 
@@ -191,7 +209,7 @@ int32_t Raycaster::RoundDownToMultipleOf(float to_round, int32_t multiple)
     return glm::floor(to_round / static_cast<float>(multiple)) * multiple;
 }
 
-const float Raycaster::kInitialPosX = 320.0f;
-const float Raycaster::kInitialPosY = 320.0f;
-const float Raycaster::kInitialPosOrientationDeg = 90.0f;
+const float Raycaster::kInitialPosX = 512.571f;
+const float Raycaster::kInitialPosY = 264.619f;
+const float Raycaster::kInitialPosOrientationDeg = 5.93997f;
 const float Raycaster::kMovementUnitsPerSec = 64.0f;
