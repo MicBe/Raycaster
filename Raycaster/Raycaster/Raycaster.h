@@ -16,14 +16,11 @@ public:
     virtual void Render() override;
     virtual void Update(uint32_t delta_ticks) override;
 
-    virtual void OnKeyDown(SDL_Keycode key) override;
-    virtual void OnKeyUp(SDL_Keycode key) override;
-
 private:
     void DrawStripe(uint32_t y, uint32_t length);
     float RoundUpToMultipleOf(float to_round, int32_t multiple);
     int32_t RoundDownToMultipleOf(float to_round, int32_t multiple);
-	Ray CastRay(const Ray& ray);
+	void CastRay(Ray& ray);
 
 private:
     Camera camera_;

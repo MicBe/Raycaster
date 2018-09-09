@@ -1,12 +1,13 @@
 #pragma once
 
-#include <cstdint>
+#include <glm/glm.hpp>
+
 #include <utility>
 
 class Camera
 {
 public:
-    Camera(float position_x, float position_y, float orientation_deg,
+    Camera(const glm::vec2& position, float orientation_deg,
            int32_t fov, int32_t height, float units_per_sec);
 
     void GoForward(int32_t time_elapsed);
@@ -14,8 +15,7 @@ public:
     void RotateLeft(int32_t time_elapsed);
     void RotateRight(int32_t time_elapsed);
 
-    float position_x() const;
-    float position_y() const;
+    const glm::vec2& position() const;
     float orientation_deg() const;
     int32_t fov() const;
     int32_t height();
@@ -23,8 +23,7 @@ public:
 private:
     std::pair<float, float> GetDeltaMove(int32_t time_elapsed) const;
 
-    float position_x_;
-    float position_y_;
+	glm::vec2 position_;
     float orientation_deg_;
     int32_t fov_;
     int32_t height_;

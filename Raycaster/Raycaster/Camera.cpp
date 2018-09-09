@@ -2,10 +2,9 @@
 
 #include <glm/glm.hpp>
 
-Camera::Camera(float position_x, float position_y, float orientation_deg,
+Camera::Camera(const glm::vec2& position, float orientation_deg,
                int32_t fov, int32_t height, float units_per_sec)
-    :position_x_(position_x),
-    position_y_(position_y),
+    :position_(position.x, position.y),
     orientation_deg_(orientation_deg),
     fov_(fov),
     height_(height),
@@ -17,15 +16,15 @@ Camera::Camera(float position_x, float position_y, float orientation_deg,
 void Camera::GoForward(int32_t time_elapsed)
 {
     auto delta = GetDeltaMove(time_elapsed);
-    position_x_ += delta.first;
-    position_y_ += delta.second;
+    position_.x += delta.first;
+    position_.y += delta.second;
 }
 
 void Camera::GoBackward(int32_t time_elapsed)
 {
     auto delta = GetDeltaMove(time_elapsed);
-    position_x_ -= delta.first;
-    position_y_ -= delta.second;
+    position_.x -= delta.first;
+    position_.y -= delta.second;
 }
 
 void Camera::RotateLeft(int32_t time_elapsed)
@@ -42,14 +41,9 @@ void Camera::RotateRight(int32_t time_elapsed)
         orientation_deg_ += 360.0f;
 }
 
-float Camera::position_x() const
+const glm::vec2& Camera::position() const
 {
-    return position_x_;
-}
-
-float Camera::position_y() const
-{
-    return position_y_;
+	return position_;
 }
 
 float Camera::orientation_deg() const
@@ -71,8 +65,8 @@ std::pair<float, float> Camera::GetDeltaMove(int32_t time_elapsed) const
 {
     const float move_coeff = movement_units_per_sec_ * static_cast<float>(time_elapsed / 1000.0f);
 
-    float delta_x = cos(glm::radians(orientation_deg_)) * move_coeff;
-    float delta_y = -sin(glm::radians(orientation_deg_)) * move_coeff;
+    const float delta_x = cos(glm::radians(orientation_deg_)) * move_coeff;
+    const float delta_y = -sin(glm::radians(orientation_deg_)) * move_coeff;
 
     return std::make_pair(delta_x, delta_y);
 }
